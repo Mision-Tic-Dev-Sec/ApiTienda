@@ -8,15 +8,14 @@ const app = Express();
 
 app.use(Express.json());
 
-app.get('/vehiculos', (req, res) => {
-  console.log('alguien hizo get en la ruta /vehiculos');
-  const vehiculos = [
-    { nombre: 'corolla', marca: 'toyota', modelo: '2014' },
-    { nombre: 'yaris', marca: 'toyota', modelo: '2020' },
-    { nombre: 'fiesta', marca: 'ford', modelo: '2020' },
-    { nombre: 'cx30', marca: 'mazda', modelo: '2020' },
+app.get('/usuarios', (req, res) => {
+  console.log('alguien hizo get en la ruta /usuarios');
+  const usuarios = [
+    { id: '001', name: 'Raul Gonzales', mail: 'raul@gmail.com', rol: 'Administrador', state: 'Autorizado', date:'12/01/2021 18:00' },
+    { id: '002', name: 'Manuel Moncada', mail: 'manuel@gmail.com', rol: 'vendedor', state: 'pendiente', date: '24/02/2021 14:00' },
+    { id: '003', name: 'Juana Perez', mail: 'Juana@gmail.com', rol: 'vendedor', state: 'no autorizado', date: '24/05/2020 08:00' },
   ];
-  res.send(vehiculos);
+  res.send(usuarios);
 });
 
 app.post('/vehiculos/nuevo', (req, res) => {
