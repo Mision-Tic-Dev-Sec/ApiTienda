@@ -3,19 +3,36 @@
 
 // hacer el nuevo import
 import Express from 'express';
+import { MongoClient, ObjectId } from 'mongodb';
+import Cors from 'cors';
+
+const stringConexion = 'mongodb+srv://admin:admin@moduloventas.imhew.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+
+const client = new MongoClient(stringConexion, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+let baseDeDatos;
 
 const app = Express();
 
 app.use(Express.json());
+app.use(Cors());
 
-app.get('/usuarios', (req, res) => {
-  console.log('alguien hizo get en la ruta /usuarios');
-  const usuarios = [
-    { id: '001', name: 'Raul Gonzales', mail: 'raul@gmail.com', rol: 'Administrador', state: 'Autorizado', date:'12/01/2021 18:00' },
-    { id: '002', name: 'Manuel Moncada', mail: 'manuel@gmail.com', rol: 'vendedor', state: 'pendiente', date: '24/02/2021 14:00' },
-    { id: '003', name: 'Juana Perez', mail: 'Juana@gmail.com', rol: 'vendedor', state: 'no autorizado', date: '24/05/2020 08:00' },
-  ];
-  res.send(usuarios);
+app.get('/vehiculos', (req, res) => {
+  console.log('alguien hizo get en la ruta /vehiculos');
+  baseDeDatos
+    .collection('vehiculo')
+    .find()
+    .limit(50)
+    .toArray((err, result) => {
+      if (err) {
+        res.status(500).send('Error consultando los vehiculos');
+      } else {
+        res.json(result);
+      }
+    });
 });
 
 app.post('/vehiculos/nuevo', (req, res) => {
@@ -29,7 +46,15 @@ app.post('/vehiculos/nuevo', (req, res) => {
       Object.keys(datosVehiculo).includes('model')
     ) {
       // implementar código para crear vehículo en la BD
-      res.sendStatus(200);
+      baseDeDatos.collection('vehiculo').insertOne(datosVehiculo, (err, result) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(500);
+        } else {
+          console.log(result);
+          res.sendStatus(200);
+        }
+      });
     } else {
       res.sendStatus(500);
     }
@@ -38,6 +63,145 @@ app.post('/vehiculos/nuevo', (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log('escuchando puerto 5000');
+app.patch('/vehiculos/editar', (req, res) => {
+  const edicion = req.body;
+  console.log(edicion);
+  const filtroVehiculo = { _id: new ObjectId(edicion.id) };
+  delete edicion.id;
+  const operacion = {
+    $set: edicion,
+  };
+  baseDeDatos
+    .collection('vehiculo')
+    .findOneAndUpdate(
+      filtroVehiculo,
+      operacion,
+      { upsert: true, returnOriginal: true },
+      (err, result) => {
+        if (err) {
+          console.error('error actualizando el vehiculo: ', err);
+          res.sendStatus(500);
+        } else {
+          console.log('actualizado con exito');
+          res.sendStatus(200);
+        }
+      }
+    );
 });
+
+app.delete('/vehiculos/eliminar', (req, res) => {
+  const filtroVehiculo = { _id: new ObjectId(req.body.id) };
+  baseDeDatos.collection('vehiculo').deleteOne(filtroVehiculo, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(500);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
+
+
+
+
+app.get('/productos', (req, res) => {
+  console.log('alguien hizo get en la ruta /productos');
+  baseDeDatos
+    .collection('producto')
+    .find()
+    .limit(50)
+    .toArray((err, result) => {
+      if (err) {
+        res.status(500).send('Error consultando los productos');
+      } else {
+        res.json(result);
+      }
+    });
+});
+
+app.post('/productos/nuevo', (req, res) => {
+  console.log(req);
+  const datosProducto = req.body;
+  console.log('llaves: ', Object.keys(datosProducto));
+  try {
+    if (
+      Object.keys(datosProducto).includes('idProducto') &&
+      Object.keys(datosProducto).includes('nombreProducto') &&
+      Object.keys(datosProducto).includes('precio')
+    ) {
+      // implementar código para crear vehículo en la BD
+      baseDeDatos.collection('producto').insertOne(datosProducto, (err, result) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(500);
+        } else {
+          console.log(result);
+          res.sendStatus(200);
+        }
+      });
+    } else {
+      res.sendStatus(500);
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+app.patch('/productos/editar', (req, res) => {
+  const edicion = req.body;
+  console.log(edicion);
+  const filtroProducto = { _id: new ObjectId(edicion.id) };
+  delete edicion.id;
+  const operacion = {
+    $set: edicion,
+  };
+  baseDeDatos
+    .collection('producto')
+    .findOneAndUpdate(
+      filtroProducto,
+      operacion,
+      { upsert: true, returnOriginal: true },
+      (err, result) => {
+        if (err) {
+          console.error('error actualizando el producto: ', err);
+          res.sendStatus(500);
+        } else {
+          console.log('actualizado con exito');
+          res.sendStatus(200);
+        }
+      }
+    );
+});
+
+app.delete('/productos/eliminar', (req, res) => {
+  const filtroVehiculo = { _id: new ObjectId(req.body.id) };
+  baseDeDatos.collection('producto').deleteOne(filtroProducto, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(500);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
+
+
+
+
+const main = () => {
+  client.connect((err, db) => {
+    if (err) {
+      console.error('Error conectando a la base de datos');
+      return 'error';
+    }
+    baseDeDatos = db.db('concesionario');
+    console.log('baseDeDatos exitosa');
+    return app.listen(5000, () => {
+      console.log('escuchando puerto 5000');
+    });
+  });
+};
+
+main();
