@@ -175,7 +175,7 @@ app.patch('/productos/editar', (req, res) => {
 });
 
 app.delete('/productos/eliminar', (req, res) => {
-  const filtroVehiculo = { _id: new ObjectId(req.body.id) };
+  const filtroProducto = { _id: new ObjectId(req.body.id) };
   baseDeDatos.collection('producto').deleteOne(filtroProducto, (err, result) => {
     if (err) {
       console.error(err);
