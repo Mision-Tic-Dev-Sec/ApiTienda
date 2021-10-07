@@ -6,7 +6,7 @@ import Express from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
 import Cors from 'cors';
 
-const stringConexion = 'mongodb+srv://admin:admin@moduloventas.imhew.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const stringConexion = 'mongodb+srv://carlos:passwordcarlos@devsec3.esivf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 const client = new MongoClient(stringConexion, {
   useNewUrlParser: true,
@@ -16,19 +16,6 @@ const client = new MongoClient(stringConexion, {
 let baseDeDatos;
 
 const app = Express();
-import { MongoClient, ObjectId } from 'mongodb';
-import Cors from 'cors';
-
-const stringConexion = 'mongodb+srv://carlos:passwordcarlos@proyectotienda.18ddo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-
-const client = new MongoClient(stringConexion, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-let baseDeDatos;
-
-//const app = Express();
 
 app.use(Express.json());
 app.use(Cors());
