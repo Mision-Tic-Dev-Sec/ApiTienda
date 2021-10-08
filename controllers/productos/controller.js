@@ -3,7 +3,7 @@ import { getDB } from '../../db/db.js';
 
 const queryAllProducts = async (callback) => {
   const baseDeDatos = getDB();
-  await baseDeDatos.collection('Producto').find({}).limit(50).toArray(callback);
+  await baseDeDatos.collection('producto').find({}).limit(50).toArray(callback);
 };
 
 const crearProducto = async (datosProducto, callback) => {
@@ -14,7 +14,7 @@ const crearProducto = async (datosProducto, callback) => {
   ) {
     const baseDeDatos = getDB();
     // implementar código para crear vehículo en la BD
-    await baseDeDatos.collection('Producto').insertOne(datosProducto, callback);
+    await baseDeDatos.collection('producto').insertOne(datosProducto, callback);
   } else {
     return 'error';
   }
@@ -22,7 +22,7 @@ const crearProducto = async (datosProducto, callback) => {
 
 const consultarProducto = async (id, callback) => {
   const baseDeDatos = getDB();
-  await baseDeDatos.collection('Producto').findOne({ _id: new ObjectId(id) }, callback);
+  await baseDeDatos.collection('producto').findOne({ _id: new ObjectId(id) }, callback);
 };
 
 const editarProducto = async (id, edicion, callback) => {
@@ -32,14 +32,14 @@ const editarProducto = async (id, edicion, callback) => {
   };
   const baseDeDatos = getDB();
   await baseDeDatos
-    .collection('Producto')
+    .collection('producto')
     .findOneAndUpdate(filtroProducto, operacion, { upsert: true, returnOriginal: true }, callback);
 };
 
 const eliminarProducto = async (id, callback) => {
   const filtroProducto = { _id: new ObjectId(id) };
   const baseDeDatos = getDB();
-  await baseDeDatos.collection('Producto').deleteOne(filtroProducto, callback);
+  await baseDeDatos.collection('producto').deleteOne(filtroProducto, callback);
 };
 
 export { queryAllProducts, crearProducto, consultarProducto, editarProducto, eliminarProducto };
