@@ -4,17 +4,28 @@ import { getDB } from '../../db/db.js';
 const queryAllUsers = async (callback) => {
   const baseDeDatos = getDB();
   console.log('query');
-  await baseDeDatos.collection('usuario').find({}).limit(50).toArray(callback);
+  await baseDeDatos.collection('usuarios').find({}).limit(50).toArray(callback);
 };
 
 const crearUsuario = async (datosUsuario, callback) => {
-  const baseDeDatos = getDB();
-  await baseDeDatos.collection('usuario').insertOne(datosUsuario, callback);
+  if (
+    Object.keys(datosUsuario).includes('name') &&
+    Object.keys(datosUsuario).includes('mail') &&
+    Object.keys(datosUsuario).includes('rol') &&
+    Object.keys(datosUsuario).includes('state') &&
+    Object.keys(datosUsuario).includes('date')
+  ) {
+    const baseDeDatos = getDB();
+    // implementar código para crear vehículo en la BD
+    await baseDeDatos.collection('usuarios').insertOne(datosUsuario, callback);
+  } else {
+    return 'error';
+  }  
 };
 
 const consultarUsuario = async (id, callback) => {
   const baseDeDatos = getDB();
-  await baseDeDatos.collection('usuario').findOne({ _id: new ObjectId(id) }, callback);
+  await baseDeDatos.collection('usuarios').findOne({ _id: new ObjectId(id) }, callback);
 };
 
 const editarUsuario = async (id, edicion, callback) => {
@@ -24,14 +35,14 @@ const editarUsuario = async (id, edicion, callback) => {
   };
   const baseDeDatos = getDB();
   await baseDeDatos
-    .collection('usuario')
+    .collection('usuarios')
     .findOneAndUpdate(filtroUsuario, operacion, { upsert: true, returnOriginal: true }, callback);
 };
 
 const eliminarUsuario = async (id, callback) => {
   const filtroUsuario = { _id: new ObjectId(id) };
   const baseDeDatos = getDB();
-  await baseDeDatos.collection('usuario').deleteOne(filtroUsuario, callback);
+  await baseDeDatos.collection('usuarios').deleteOne(filtroUsuario, callback);
 };
 
 export { queryAllUsers, crearUsuario, consultarUsuario, editarUsuario, eliminarUsuario };
