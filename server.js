@@ -184,6 +184,94 @@ app.delete('/usuarios/eliminar', (req, res) => {
   });
 });
 
+app.get('/ventas', (req, res) => {
+  console.log('alguien hizo get en la ruta /ventas');
+  baseDeDatos
+    .collection('venta')
+    .find()
+    .limit(50)
+    .toArray((err, result) => {
+      if (err) {
+        res.status(500).send('Error consultando las ventas');
+      } else {
+        res.json(result);
+      }
+    });
+});
+
+app.post('/ventas/nuevo', (req, res) => {
+  console.log(req);
+  const datosVenta = req.body;
+  console.log('llaves: ', Object.keys(datosVenta));
+  try {
+    if (
+      Object.keys(datosVenta).includes('idVenta') &&
+      Object.keys(datosVenta).includes('valorVenta') &&
+      Object.keys(datosVenta).includes('idProductos') &&
+      Object.keys(datosVenta).includes('cantidad') &&
+      Object.keys(datosVenta).includes('precioUnitario') &&
+      Object.keys(datosVenta).includes('fechaVenta') &&
+      Object.keys(datosVenta).includes('idCliente') &&
+      Object.keys(datosVenta).includes('nombreCliente') &&
+      Object.keys(datosVenta).includes('vendedor') &&
+      Object.keys(datosVenta).includes('estado')
+    ) {
+      // implementar código para crear vehículo en la BD
+      baseDeDatos.collection('venta').insertOne(datosVenta, (err, result) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(500);
+        } else {
+          console.log(result);
+          res.sendStatus(200);
+        }
+      });
+    } else {
+      res.sendStatus(500);
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+app.patch('/ventas/editar', (req, res) => {
+  const edicion = req.body;
+  console.log(edicion);
+  const filtroVenta = { _id: new ObjectId(edicion.id) };
+  delete edicion.id;
+  const operacion = {
+    $set: edicion,
+  };
+  baseDeDatos
+    .collection('venta')
+    .findOneAndUpdate(
+      filtroVenta,
+      operacion,
+      { upsert: true, returnOriginal: true },
+      (err, result) => {
+        if (err) {
+          console.error('error actualizando la venta: ', err);
+          res.sendStatus(500);
+        } else {
+          console.log('actualizado con exito');
+          res.sendStatus(200);
+        }
+      }
+    );
+});
+
+app.delete('/ventas/eliminar', (req, res) => {
+  const filtroVenta = { _id: new ObjectId(req.body.id) };
+  baseDeDatos.collection('venta').deleteOne(filtroVenta, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(500);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
 const main = () => {
   client.connect((err, db) => {
     if (err) {
