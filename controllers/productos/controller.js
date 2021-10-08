@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { getDB } from '../../db/db.js';
 
-const queryAllproducts = async (callback) => {
+const queryAllProducts = async (callback) => {
   const baseDeDatos = getDB();
   await baseDeDatos.collection('Producto').find({}).limit(50).toArray(callback);
 };
@@ -42,4 +42,4 @@ const eliminarProducto = async (id, callback) => {
   await baseDeDatos.collection('Producto').deleteOne(filtroProducto, callback);
 };
 
-export { queryAllproducts, crearProducto, consultarProducto, editarProducto, eliminarProducto };
+export { queryAllProducts, crearProducto, consultarProducto, editarProducto, eliminarProducto };
