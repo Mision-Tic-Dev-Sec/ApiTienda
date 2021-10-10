@@ -30,6 +30,7 @@ const consultarUsuario = async (id, callback) => {
 
 const editarUsuario = async (id, edicion, callback) => {
   const filtroUsuario = { _id: new ObjectId(id) };
+  delete edicion.id
   const operacion = {
     $set: edicion,
   };
