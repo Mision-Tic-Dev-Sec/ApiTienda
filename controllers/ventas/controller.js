@@ -8,24 +8,8 @@ const queryAllSales = async (callback) => {
 };
 
 const crearVenta = async (datosVenta, callback) => {
-  if (
-    Object.keys(datosVenta).includes('idVenta') &&
-    Object.keys(datosVenta).includes('valorVenta') &&
-    Object.keys(datosVenta).includes('idProductos') &&
-    Object.keys(datosVenta).includes('cantidad') &&
-    Object.keys(datosVenta).includes('precioUnitario') &&
-    Object.keys(datosVenta).includes('fechaVenta') &&
-    Object.keys(datosVenta).includes('idCliente') &&
-    Object.keys(datosVenta).includes('nombreCliente') &&
-    Object.keys(datosVenta).includes('vendedor') &&
-    Object.keys(datosVenta).includes('estado')
-  ) {
-    const baseDeDatos = getDB();
-    // implementar código para crear vehículo en la BD
-    await baseDeDatos.collection('venta').insertOne(datosVenta, callback);
-  } else {
-    return 'error';
-  } 
+  const baseDeDatos = getDB();
+  await baseDeDatos.collection('venta').insertOne(datosVenta, callback);
 };
 
 const consultarVenta = async (id, callback) => {
