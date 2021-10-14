@@ -35,8 +35,8 @@ const consultarOCrearUsuario = async (req, callback) => {
       // 7.2. si el usuario no esta en la bd, lo crea y devuelve la info
       user.auth0ID = user._id;
       delete user._id;
-      user.rol = 'inactivo';
-      user.state = 'pendiente';
+      user.rol = 'Inactivo';
+      user.state = 'Pendiente';
       await crearUsuario(user, (err, respuesta) => callback(err, user));
     }
   });
