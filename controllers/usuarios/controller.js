@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDB } from '../../db/db.js';
+import jwt_decode from 'jwt-decode';
 
 const queryAllUsers = async (callback) => {
   const baseDeDatos = getDB();
@@ -8,24 +9,37 @@ const queryAllUsers = async (callback) => {
 };
 
 const crearUsuario = async (datosUsuario, callback) => {
-  if (
-    Object.keys(datosUsuario).includes('name') &&
-    Object.keys(datosUsuario).includes('mail') &&
-    Object.keys(datosUsuario).includes('rol') &&
-    Object.keys(datosUsuario).includes('state') &&
-    Object.keys(datosUsuario).includes('date')
-  ) {
-    const baseDeDatos = getDB();
-    // implementar código para crear vehículo en la BD
-    await baseDeDatos.collection('usuarios').insertOne(datosUsuario, callback);
-  } else {
-    return 'error';
-  }  
+  const baseDeDatos = getDB();
+  await baseDeDatos.collection('usuarios').insertOne(datosUsuario, callback);
 };
 
 const consultarUsuario = async (id, callback) => {
   const baseDeDatos = getDB();
   await baseDeDatos.collection('usuarios').findOne({ _id: new ObjectId(id) }, callback);
+};
+
+const consultarOCrearUsuario = async (req, callback) => {
+  // 6.1. obtener los datos del usuario desde el token
+  const token = req.headers.authorization.split('Bearer ')[1];
+  const user = jwt_decode(token)['http://localhost/userData'];
+  console.log(user);
+
+  // 6.2. con el correo del usuario o con el id de auth0, verificar si el usuario ya esta en la bd o no
+  const baseDeDatos = getDB();
+  await baseDeDatos.collection('usuarios').findOne({ email: user.email }, async (err, response) => {
+    console.log('response consulta bd', response);
+    if (response) {
+      // 7.1. si el usuario ya esta en la BD, devuelve la info del usuario
+      callback(err, response);
+    } else {
+      // 7.2. si el usuario no esta en la bd, lo crea y devuelve la info
+      user.auth0ID = user._id;
+      delete user._id;
+      user.rol = 'inactivo';
+      user.state = 'pendiente';
+      await crearUsuario(user, (err, respuesta) => callback(err, user));
+    }
+  });
 };
 
 const editarUsuario = async (id, edicion, callback) => {
@@ -46,4 +60,4 @@ const eliminarUsuario = async (id, callback) => {
   await baseDeDatos.collection('usuarios').deleteOne(filtroUsuario, callback);
 };
 
-export { queryAllUsers, crearUsuario, consultarUsuario, editarUsuario, eliminarUsuario };
+export { queryAllUsers, crearUsuario, consultarUsuario, editarUsuario, eliminarUsuario, consultarOCrearUsuario };
